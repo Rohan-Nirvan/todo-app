@@ -1,7 +1,17 @@
-'use server'
+"use server";
 
-import MongoDBWrapper from "@todo-app/db-driver"
+import MongoDBWrapper from "@todo-app/db-driver";
+import { Todo } from "../../types";
 
-export default async function add() {
-   await MongoDBWrapper.insertOne('todos', {testing: Math.random().toFixed(3)})
+export async function add({ text }: Pick<Todo, "text">) {
+  try {
+    await MongoDBWrapper.insertOne<Todo>("todos", {
+      id: Date.now().toString(),
+      text,
+      completed: false,
+    });
+    return "success";
+  } catch (err: unknown) {
+    console.error("todo add failed:", err);
+  }
 }
