@@ -1,0 +1,20 @@
+{
+  "name": "@todo-app/test-package",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./test": {
+      "types": "./src/index.tsx",
+      "default": "./dist/index.js"
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@todo-app/typescript-config": "*",
+    "typescript": "^5.8.3"
+  }
+}

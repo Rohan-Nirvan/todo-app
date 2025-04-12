@@ -1,6 +1,9 @@
 import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
+import { Button } from "@todo-app/ui/button";
 import styles from "./page.module.css";
+import test from '@todo-app/test-package/test';
+
+console.log(test());
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
