@@ -1,0 +1,27 @@
+{
+  "name": "@todo-app/db-driver",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A wrapper for db driver dependency",
+  "scripts": {
+    "mongo:local:up": "docker run -d --name todo-app-mongodb-local -p 27017:27017 -v ./db/data:/db/data mongo:8.0.6",
+    "mongo:local:down": "docker container stop todo-app-mongodb-local && docker container rm todo-app-mongodb-local",
+    "build": "tsc"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.tsx",
+      "default": "./dist/index.js"
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@todo-app/typescript-config": "*",
+    "@types/node": "^22.14.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "mongodb": "^6.15.0"
+  }
+}
