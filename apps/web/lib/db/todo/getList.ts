@@ -6,6 +6,8 @@ import { mapDbDocsObjectIdToString } from "../utils";
 
 export async function getList(): Promise<Todo[]> {
   try {
+    await DbDriver.connect();
+
     const todos: DBTodo[] = await DbDriver.find<DBTodo>(
       "todos",
       {},

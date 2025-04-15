@@ -14,18 +14,27 @@ import {
   InsertOneOptions,
 } from "mongodb";
 
+declare global {
+  // TODO: usage can be conditional for "development" using an env var
+  // Only for development: attach to globalThis
+  var _mongoClient: MongoClient | null;
+  var _mongoDb: Db | null;
+}
+
 class MongoDBWrapper {
-  private static client: MongoClient | null = null;
-  private static db: Db | null = null;
-  private static uri: string = "mongodb://localhost:27017"; // Your MongoDB URI
-  private static dbName: string = "myDatabase"; // Your database name
+  public static client: MongoClient | null =
+     global._mongoClient || null;
+  private static db: Db | null =
+     global._mongoDb || null;
+  private static uri: string = "mongodb://localhost:27017";
+  private static dbName: string = "myDatabase";
 
   // Private constructor to prevent instantiation
   private constructor() {}
 
   // Static method to initialize the MongoDB client and connect to the database
-  public static async connect(): Promise<void> {
-    if (this.client && this.db) return;
+  public static async connect(): Promise<MongoClient> {
+    if (this.client && this.db) return this.client;
 
     try {
       // New connection logic for v6.x, without useUnifiedTopology
@@ -36,7 +45,12 @@ class MongoDBWrapper {
       this.client = new MongoClient(this.uri, options);
       await this.client.connect();
       this.db = this.client.db(this.dbName);
+
+      global._mongoClient = this.client;
+      global._mongoDb = this.db;
+
       console.log("MongoDBWrapper Connected to MongoDB");
+      return this.client;
     } catch (error) {
       console.error("MongoDBWrapper Error connecting to MongoDB:", error);
       throw error;
@@ -67,7 +81,7 @@ class MongoDBWrapper {
   public static async find<T extends Document>(
     collectionName: string,
     query: MatchKeysAndValues<T>,
-    options: FindOptions & Abortable
+    options: FindOptions & Abortable = {}
   ): Promise<WithId<T>[]> {
     const collection = this.getCollection<T>(collectionName);
     return collection.find(query, options).toArray(); // Returns an array of WithId<T>

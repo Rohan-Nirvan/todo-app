@@ -8,6 +8,7 @@ import { ObjectId } from 'mongodb';
 
 export async function add({ text }: Pick<Todo, "text">): Promise<Todo> {
   try {
+    await DbDriver.connect();
     // await MongoDBWrapper.insertOne<Todo>("todos", {
     const newTodo: TodoUnsaved = {
       // _id: Date.now().toString(),
