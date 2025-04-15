@@ -1,4 +1,4 @@
-"use server";
+// "use server";
 
 import {
   MongoClient,
@@ -11,6 +11,7 @@ import {
   MatchKeysAndValues,
   FindOptions,
   Abortable,
+  InsertOneOptions,
 } from "mongodb";
 
 class MongoDBWrapper {
@@ -35,9 +36,9 @@ class MongoDBWrapper {
       this.client = new MongoClient(this.uri, options);
       await this.client.connect();
       this.db = this.client.db(this.dbName);
-      console.log("Connected to MongoDB");
+      console.log("MongoDBWrapper Connected to MongoDB");
     } catch (error) {
-      console.error("Error connecting to MongoDB:", error);
+      console.error("MongoDBWrapper Error connecting to MongoDB:", error);
       throw error;
     }
   }
@@ -55,10 +56,11 @@ class MongoDBWrapper {
   // Static method to insert a document (fixing the type error with OptionalUnlessRequiredId)
   public static async insertOne<T extends Document>(
     collectionName: string,
-    document: OptionalUnlessRequiredId<T>
+    document: OptionalUnlessRequiredId<T>,
+    options?: InsertOneOptions
   ): Promise<void> {
     const collection = this.getCollection<T>(collectionName);
-    await collection.insertOne(document);
+    await collection.insertOne(document, options);
   }
 
   // Static method to find documents in a collection
@@ -94,7 +96,7 @@ class MongoDBWrapper {
   public static async close(): Promise<void> {
     if (this.client) {
       await this.client.close();
-      console.log("MongoDB connection closed");
+      console.log("MongoDBWrapper MongoDB connection closed");
     }
   }
 }

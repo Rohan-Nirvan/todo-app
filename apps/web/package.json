@@ -11,12 +11,14 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.1",
     "@todo-app/db-driver": "*",
     "@todo-app/test-package": "*",
     "@todo-app/ui": "*",
     "next": "^15.2.4",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@todo-app/eslint-config": "*",

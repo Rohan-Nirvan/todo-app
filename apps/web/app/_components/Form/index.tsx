@@ -4,9 +4,13 @@ import React, { useState } from "react";
 import { Input } from "@todo-app/ui/input";
 import { Button } from "@todo-app/ui/button";
 import { add } from "../../../lib/db/todo";
+import { addTodo } from "../../../store/slice";
+import { useAppDispatch } from "../../../store/hooks";
+import { Todo } from "../../../lib";
 
 const TodoForm = () => {
   const [value, setValue] = useState("");
+  const dispatch = useAppDispatch();
 
   const validateForm = (): boolean => {
     if (!value.trim()) return false;
@@ -23,7 +27,14 @@ const TodoForm = () => {
 
     if (!isValid) return;
 
-    await add({ text: value });
+    const newTodo: Todo = await add({ text: value });
+    // .catch((err: unknown) => {
+    //   console.log("add failed:", err);
+    // }); // Make sure this returns the created todo
+    dispatch(addTodo(newTodo));
+    setValue("");
+
+    // await add({ text: value });
   };
   return (
     <form onSubmit={handleSubmit}>

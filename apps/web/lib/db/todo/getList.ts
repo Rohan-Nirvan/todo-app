@@ -1,16 +1,20 @@
 "use server";
 
-import MongoDBWrapper from "@todo-app/db-driver";
-import { Todo } from "../../types";
+import DbDriver from "@todo-app/db-driver";
+import { DBTodo, Todo } from "../../types";
+import { mapDbDocsObjectIdToString } from "../utils";
 
 export async function getList(): Promise<Todo[]> {
   try {
-    const todos = await MongoDBWrapper.find<Todo>(
+    const todos: DBTodo[] = await DbDriver.find<DBTodo>(
       "todos",
-      {}
-      // { limit: 10 }
+      {},
+      { limit: 12 }
     );
-    return todos;
+
+    const mappedTodos: Todo[] = mapDbDocsObjectIdToString(todos);
+    // console.log("mappedTodos:", mappedTodos);
+    return mappedTodos;
   } catch (err: unknown) {
     console.error("todo add failed:", err);
     throw new Error("Something went wrong!");
