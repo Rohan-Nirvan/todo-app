@@ -3,10 +3,13 @@
 import DbDriver from "@todo-app/db-driver";
 import { Todo, TodoUnsaved } from "../../types";
 import { mapDbDocObjectIdToString } from "../utils";
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
-
-export async function add({ text }: Pick<Todo, "text">): Promise<Todo> {
+export async function add({
+  text,
+  priority,
+  targetdate,
+}: Pick<Todo, "text" | "priority" | "targetdate">): Promise<Todo> {
   try {
     await DbDriver.connect();
     // await MongoDBWrapper.insertOne<Todo>("todos", {
@@ -14,6 +17,8 @@ export async function add({ text }: Pick<Todo, "text">): Promise<Todo> {
       // _id: Date.now().toString(),
       text,
       completed: false,
+      priority,
+      targetdate,
     };
 
     await DbDriver.insertOne<TodoUnsaved>("todos", newTodo, {});
@@ -24,7 +29,9 @@ export async function add({ text }: Pick<Todo, "text">): Promise<Todo> {
     //   text: newTodo.text,
     //   completed: newTodo.completed,
     // };
-    const savedTodo: Todo = mapDbDocObjectIdToString(newTodo as TodoUnsaved & {_id: ObjectId});
+    const savedTodo: Todo = mapDbDocObjectIdToString(
+      newTodo as TodoUnsaved & { _id: ObjectId }
+    );
     // console.log("add server-action mapped savedTodo:", savedTodo);
     return savedTodo;
   } catch (err: unknown) {
