@@ -54,8 +54,11 @@ export default function TodoList() {
 
           <p
             className={`font-medium text-lg ${
-              todo.completed ? "line-through text-gray-400" : "text-black"
+              todo.completed ? "line-through text-gray-400 cross" : "text-black"
             }`}
+            // className={`font-medium text-lg ${
+            //   true ? "line-through text-gray-400" : "text-black"
+            // }`}
           >
             Task: {todo.text}
           </p>
