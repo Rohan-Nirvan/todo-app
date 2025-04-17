@@ -9,7 +9,7 @@ export async function toggleTodoCompleteapp(
 ): Promise<void> {
   try {
     await DbDriver.connect();
-    console.log("🛠 Updating todo:", id, "currentStatus:", currentStatus);
+    console.log(" Updating todo:", id, "currentStatus:", currentStatus);
 
     const result = await DbDriver.updateOne(
       "todos",
