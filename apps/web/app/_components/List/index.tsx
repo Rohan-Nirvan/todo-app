@@ -5,9 +5,14 @@ import { getList, Todo } from "../../../lib";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setTodos, TodoState } from "../../../store/slice";
 import { deleteTodo, toggleTodoComplete } from "../../../store/slice";
+import { toggleTodoCompleteapp } from "../../../lib/db/todo/togglecomplete";
 
 export default function TodoList() {
   const dispatch = useAppDispatch();
+  // async function fetchTodo() {
+  //   const todos: Todo[] = await toggleTodoCompleteapp();
+  // }
+  // fetchTodo(todos);
 
   useEffect(() => {
     async function initList() {
@@ -20,8 +25,8 @@ export default function TodoList() {
 
   const list: Todo[] = useAppSelector((state: TodoState) => state.todos);
 
-  const handleCheckboxChange = (id: string) => {
-    dispatch(toggleTodoComplete(id));
+  const handleCheckboxChange = async (id: string, completed: boolean) => {
+    await toggleTodoCompleteapp(id, completed);
     console.log("Checked item with ID:", id);
   };
 
@@ -41,7 +46,7 @@ export default function TodoList() {
           <input
             type="checkbox"
             checked={todo.completed}
-            onChange={() => handleCheckboxChange(todo._id)}
+            onChange={() => handleCheckboxChange(todo._id, todo.completed)}
             className="w-4 h-4"
           />
           <p className="font-medium">Task: {todo.text}</p>
