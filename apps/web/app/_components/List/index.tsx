@@ -27,6 +27,8 @@ export default function TodoList() {
 
   const handleCheckboxChange = async (id: string, completed: boolean) => {
     await toggleTodoCompleteapp(id, completed);
+    const updatedTodos: Todo[] = await getList(); // fetch updated list from DB
+    dispatch(setTodos(updatedTodos)); // update Redux store
     console.log("Checked item with ID:", id);
   };
 
@@ -49,7 +51,15 @@ export default function TodoList() {
             onChange={() => handleCheckboxChange(todo._id, todo.completed)}
             className="w-4 h-4"
           />
-          <p className="font-medium">Task: {todo.text}</p>
+
+          <p
+            className={`font-medium text-lg ${
+              todo.completed ? "line-through text-gray-400" : "text-black"
+            }`}
+          >
+            Task: {todo.text}
+          </p>
+          {/* <p className="font-medium">Task: {todo.text}</p> */}
           <p className="text-sm">Target Date: {todo.targetdate}</p>
           <p className="text-sm">Priority: {todo.priority}</p>
 

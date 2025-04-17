@@ -12,6 +12,7 @@ import {
   FindOptions,
   Abortable,
   InsertOneOptions,
+  UpdateResult,
 } from "mongodb";
 
 declare global {
@@ -22,10 +23,8 @@ declare global {
 }
 
 class MongoDBWrapper {
-  public static client: MongoClient | null =
-     global._mongoClient || null;
-  private static db: Db | null =
-     global._mongoDb || null;
+  public static client: MongoClient | null = global._mongoClient || null;
+  private static db: Db | null = global._mongoDb || null;
   private static uri: string = "mongodb://localhost:27017";
   private static dbName: string = "myDatabase";
 
@@ -87,15 +86,24 @@ class MongoDBWrapper {
     return collection.find(query, options).toArray(); // Returns an array of WithId<T>
   }
 
-  // Static method to update a document
   public static async updateOne<T extends Document>(
     collectionName: string,
     query: MatchKeysAndValues<T>,
     updateDoc: MatchKeysAndValues<T>
-  ): Promise<void> {
+  ): Promise<UpdateResult> {
     const collection = this.getCollection<T>(collectionName);
-    await collection.updateOne(query, { $set: updateDoc });
+    return await collection.updateOne(query, { $set: updateDoc });
   }
+
+  // // Static method to update a document
+  // public static async updateOne<T extends Document>(
+  //   collectionName: string,
+  //   query: MatchKeysAndValues<T>,
+  //   updateDoc: MatchKeysAndValues<T>
+  // ): Promise<void> {
+  //   const collection = this.getCollection<T>(collectionName);
+  //   await collection.updateOne(query, { $set: updateDoc });
+  // }
 
   // Static method to delete a document
   public static async deleteOne<T extends Document>(
