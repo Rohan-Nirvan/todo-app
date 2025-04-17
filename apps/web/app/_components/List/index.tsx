@@ -10,6 +10,10 @@ import { toggleTodoCompleteapp } from "../../../lib/db/todo/togglecomplete";
 export default function TodoList() {
   const dispatch = useAppDispatch();
   const [hideCompleted, setHideCompleted] = useState(false);
+  const [sortOption, setSortOption] = useState<"date" | "priority" | "none">(
+    "none"
+  );
+
   // async function fetchTodo() {
   //   const todos: Todo[] = await toggleTodoCompleteapp();
   // }
@@ -37,49 +41,128 @@ export default function TodoList() {
     dispatch(deleteTodo(id));
     console.log("Deleted item with ID:", id);
   };
-
+  const sortedList = [...list]
+    .filter((todo) => (hideCompleted ? !todo.completed : true))
+    .sort((a, b) => {
+      if (sortOption === "date") {
+        return (
+          new Date(b.targetdate).getTime() - new Date(a.targetdate).getTime()
+        ); // latest first
+      } else if (sortOption === "priority") {
+        const priorityMap = { high: 3, medium: 2, low: 1 };
+        return priorityMap[b.priority] - priorityMap[a.priority]; // High → Low
+      }
+      return 0;
+    });
   return (
     <div className="">
       <h1 className="">TodoList</h1>
+
+      {/* ✅ Toggle Completed Button */}
       <button
         onClick={() => setHideCompleted((prev) => !prev)}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         {hideCompleted ? "Show Completed Tasks" : "Hide Completed Tasks"}
       </button>
-      {list
-        ?.filter((todo) => (hideCompleted ? !todo.completed : true))
-        .map((todo) => (
-          <div key={todo._id} className="mb-2 p-2 border rounded">
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={() => handleCheckboxChange(todo._id, todo.completed)}
-              className="w-4 h-4"
-            />
 
-            <p
-              className={`font-medium text-lg ${
-                todo.completed ? "line-through text-gray-400" : "text-black"
-              }`}
-            >
-              Task: {todo.text}
-            </p>
+      {/* ✅ Sort Buttons */}
+      <div className="mb-4 flex gap-3">
+        <span className="font-semibold">Sort by:</span>
+        <button
+          onClick={() => setSortOption("date")}
+          className="px-2 py-1 border rounded bg-gray-200 hover:bg-gray-300"
+        >
+          Date
+        </button>
+        <button
+          onClick={() => setSortOption("priority")}
+          className="px-2 py-1 border rounded bg-gray-200 hover:bg-gray-300"
+        >
+          Priority
+        </button>
+        <button
+          onClick={() => setSortOption("none")}
+          className="px-2 py-1 border rounded bg-gray-200 hover:bg-gray-300"
+        >
+          Clear Sort
+        </button>
+      </div>
 
-            <p className="text-sm">Target Date: {todo.targetdate}</p>
-            <p className="text-sm">Priority: {todo.priority}</p>
+      {/* ✅ Render Sorted & Filtered List */}
+      {sortedList.map((todo) => (
+        <div key={todo._id} className="mb-2 p-2 border rounded">
+          <input
+            type="checkbox"
+            checked={todo.completed}
+            onChange={() => handleCheckboxChange(todo._id, todo.completed)}
+            className="w-4 h-4"
+          />
 
-            <button
-              onClick={() => handleDelete(todo._id)}
-              className="mt-2 sm:mt-0 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+          <p
+            className={`font-medium text-lg ${
+              todo.completed ? "line-through text-gray-400" : "text-black"
+            }`}
+          >
+            Task: {todo.text}
+          </p>
+
+          <p className="text-sm">Target Date: {todo.targetdate}</p>
+          <p className="text-sm">Priority: {todo.priority}</p>
+
+          <button
+            onClick={() => handleDelete(todo._id)}
+            className="mt-2 sm:mt-0 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+          >
+            Delete
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
+//   return (
+//     <div className="">
+//       <h1 className="">TodoList</h1>
+//       <button
+//         onClick={() => setHideCompleted((prev) => !prev)}
+//         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+//       >
+//         {hideCompleted ? "Show Completed Tasks" : "Hide Completed Tasks"}
+//       </button>
+//       {list
+//         ?.filter((todo) => (hideCompleted ? !todo.completed : true))
+//         .map((todo) => (
+//           <div key={todo._id} className="mb-2 p-2 border rounded">
+//             <input
+//               type="checkbox"
+//               checked={todo.completed}
+//               onChange={() => handleCheckboxChange(todo._id, todo.completed)}
+//               className="w-4 h-4"
+//             />
+
+//             <p
+//               className={`font-medium text-lg ${
+//                 todo.completed ? "line-through text-gray-400" : "text-black"
+//               }`}
+//             >
+//               Task: {todo.text}
+//             </p>
+
+//             <p className="text-sm">Target Date: {todo.targetdate}</p>
+//             <p className="text-sm">Priority: {todo.priority}</p>
+
+//             <button
+//               onClick={() => handleDelete(todo._id)}
+//               className="mt-2 sm:mt-0 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+//             >
+//               Delete
+//             </button>
+//           </div>
+//         ))}
+//     </div>
+//   );
+// }
 //   return (
 //     <div className="">
 //       <h1 className="">TodoList</h1>
