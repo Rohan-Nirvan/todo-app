@@ -10,10 +10,13 @@ import { toggleTodoCompleteapp } from "../../../lib/db/todo/togglecomplete";
 export default function TodoList() {
   const dispatch = useAppDispatch();
   const [hideCompleted, setHideCompleted] = useState(false);
-  const [sortOption, setSortOption] = useState<"date" | "priority" | "none">(
-    "none"
-  );
 
+  const [page, setPage] = useState(1);
+  const [limit] = useState(50); // Items per page
+  // const [sortOption, setSortOption] = useState<"date" | "priority" | "none">(
+  //   "none"
+  // );
+  const [loading, setLoading] = useState(false); // Loading state
   // async function fetchTodo() {
   //   const todos: Todo[] = await toggleTodoCompleteapp();
   // }
@@ -21,36 +24,67 @@ export default function TodoList() {
 
   useEffect(() => {
     async function initList() {
-      const todos: Todo[] = await getList();
-      // console.log("fetched todos:", todos);
-      dispatch(setTodos(todos));
+      setLoading(true); // Start loading
+      try {
+        const todos: Todo[] = await getList(page, limit);
+        dispatch(setTodos(todos));
+      } catch (error) {
+        console.error("Error fetching todos:", error);
+      } finally {
+        setLoading(false); // End loading
+      }
     }
     initList();
-  }, [dispatch]);
+  }, [dispatch, page]);
+
+  // useEffect(() => {
+  //   async function initList() {
+  //     const todos: Todo[] = await getList(page, limit);
+  //     // console.log("fetched todos:", todos);
+  //     dispatch(setTodos(todos));
+  //   }
+  //   initList();
+  // }, [dispatch, page]);
 
   const list: Todo[] = useAppSelector((state: TodoState) => state.todos);
 
   const handleCheckboxChange = async (id: string, completed: boolean) => {
     await toggleTodoCompleteapp(id, completed);
-    const updatedTodos: Todo[] = await getList(); // fetch updated list from DB
+    const updatedTodos: Todo[] = await getList(page, limit); // fetch updated list from DB
     dispatch(setTodos(updatedTodos)); // update Redux store
     console.log("Checked item with ID:", id);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     dispatch(deleteTodo(id));
     console.log("Deleted item with ID:", id);
+    const updatedTodos: Todo[] = await getList(page, limit);
+    dispatch(setTodos(updatedTodos));
   };
 
-  const priorityMap = {
-    [Priority.High]: 3,
-    [Priority.Medium]: 2,
-    [Priority.Low]: 1,
-  };
+  // const priorityMap = {
+  //   [Priority.High]: 3,
+  //   [Priority.Medium]: 2,
+  //   [Priority.Low]: 1,
+  // };
 
-  const sortedList = [...list].filter((todo) =>
+  const filteredList = list.filter((todo) =>
     hideCompleted ? !todo.completed : true
   );
+
+  // const priorityMap = {
+  //   [Priority.High]: 3,
+  //   [Priority.Medium]: 2,
+  //   [Priority.Low]: 1,
+  // };
+  // const sortedFilteredList = [...filteredList].sort(
+  //   (a, b) => priorityMap[b.priority] - priorityMap[a.priority]
+  // );
+
+  // const sortedList = [...list].filter((todo) =>
+  //   hideCompleted ? !todo.completed : true
+  // );
+
   // .sort((a, b) => {
   //   if (sortOption === "date") {
   //     return (
@@ -73,8 +107,15 @@ export default function TodoList() {
       >
         {hideCompleted ? "Show Completed Tasks" : "Hide Completed Tasks"}
       </button>
+      {/* ✅ Render Loader */}
+      {loading && (
+        <div className="flex justify-center items-center space-x-2">
+          <div className="w-6 h-6 border-t-2 border-blue-500 border-solid rounded-full animate-spin"></div>
+          <span>Loading...</span>
+        </div>
+      )}
 
-      {/* ✅ Sort Buttons */}
+      {/* ✅ Sort Buttons
       <div className="mb-4 flex gap-3">
         <span className="font-semibold">Sort by:</span>
         <button
@@ -95,10 +136,10 @@ export default function TodoList() {
         >
           Clear Sort
         </button>
-      </div>
+      </div> */}
 
       {/* ✅ Render Sorted & Filtered List */}
-      {sortedList.map((todo) => (
+      {filteredList.map((todo) => (
         <div key={todo._id} className="mb-2 p-2 border rounded">
           <input
             type="checkbox"
@@ -126,6 +167,22 @@ export default function TodoList() {
           </button>
         </div>
       ))}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-lg font-medium">Page {page}</span>
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

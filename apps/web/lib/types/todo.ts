@@ -6,12 +6,17 @@ export enum Priority {
   Low = "low",
 }
 
+// export enum Priority {
+//   C = "High",
+//   B = "Medium",
+//   Low = A,
+// }
+
 export interface Todo {
   _id: string;
   text: string;
   completed: boolean;
   priority: Priority;
-
 
   // priority: "high" | "medium" | "low"; // for priority task
   targetdate: string; //for date task

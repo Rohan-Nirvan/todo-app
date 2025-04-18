@@ -13,6 +13,7 @@ import {
   Abortable,
   InsertOneOptions,
   UpdateResult,
+  InsertOneResult,
 } from "mongodb";
 
 declare global {
@@ -67,13 +68,22 @@ class MongoDBWrapper {
   }
 
   // Static method to insert a document (fixing the type error with OptionalUnlessRequiredId)
+  // public static async insertOne<T extends Document>(
+  //   collectionName: string,
+  //   document: OptionalUnlessRequiredId<T>,
+  //   options?: InsertOneOptions
+  // ): Promise<void> {
+  //   const collection = this.getCollection<T>(collectionName);
+  //   await collection.insertOne(document, options);
+  // }
   public static async insertOne<T extends Document>(
     collectionName: string,
     document: OptionalUnlessRequiredId<T>,
     options?: InsertOneOptions
-  ): Promise<void> {
+  ): Promise<InsertOneResult<T>> {
     const collection = this.getCollection<T>(collectionName);
-    await collection.insertOne(document, options);
+    const result = await collection.insertOne(document, options);
+    return result;
   }
 
   // Static method to find documents in a collection
@@ -104,6 +114,17 @@ class MongoDBWrapper {
   //   const collection = this.getCollection<T>(collectionName);
   //   await collection.updateOne(query, { $set: updateDoc });
   // }
+
+  // Static method to perform aggregation
+  public static async aggregate<T extends Document>(
+    collectionName: string,
+    pipeline: object[]
+  ): Promise<WithId<T>[]> {
+    const collection = this.getCollection<T>(collectionName);
+    const result = await collection.aggregate(pipeline).toArray();
+
+    return result as WithId<T>[]; // Cast the result to WithId<T>[]
+  }
 
   // Static method to delete a document
   public static async deleteOne<T extends Document>(
