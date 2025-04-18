@@ -11,7 +11,13 @@ export async function getList(): Promise<Todo[]> {
     const todos: DBTodo[] = await DbDriver.find<DBTodo>(
       "todos",
       {},
-      { limit: 12 }
+      {
+        limit: 12,
+        sort: {
+          targetdate: 1, // ascending date
+          priority: -1, // descending priority
+        },
+      }
     );
 
     const mappedTodos: Todo[] = mapDbDocsObjectIdToString(todos);

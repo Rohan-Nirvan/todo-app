@@ -6,11 +6,13 @@ import { Button } from "@todo-app/ui/button";
 import { add } from "../../../lib/db/todo";
 import { addTodo } from "../../../store/slice";
 import { useAppDispatch } from "../../../store/hooks";
-import { Todo } from "../../../lib";
+import { Priority, Todo } from "../../../lib";
 
 const TodoForm = () => {
   const [value, setValue] = useState("");
-  const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
+  const [priority, setPriority] = useState<Priority>(Priority.Medium);
+
+  // const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
   const dispatch = useAppDispatch();
   const [targetdate, setTargetdate] = useState("");
 
@@ -29,14 +31,20 @@ const TodoForm = () => {
 
     if (!isValid) return;
 
-    const newTodo: Todo = await add({ text: value, priority, targetdate });
+    const newTodo: Todo = await add({
+      text: value,
+      priority: priority as Priority,
+      targetdate,
+    });
+
+    // const newTodo: Todo = await add({ text: value, priority, targetdate });
     // .catch((err: unknown) => {
     //   console.log("add failed:", err);
     // }); // Make sure this returns the created todo
     dispatch(addTodo(newTodo));
     setValue("");
     setTargetdate("");
-    setPriority("medium");
+    setPriority(Priority.Medium);
 
     // await add({ text: value });
   };
@@ -59,6 +67,15 @@ const TodoForm = () => {
 
       {/* Priority Dropdown */}
       <select
+        value={priority}
+        onChange={(e) => setPriority(e.target.value as Priority)}
+      >
+        <option value={Priority.High}>High</option>
+        <option value={Priority.Medium}>Medium</option>
+        <option value={Priority.Low}>Low</option>
+      </select>
+
+      {/* <select
         className="border px-3 py-2 rounded w-full"
         value={priority}
         onChange={(e) =>
@@ -68,7 +85,7 @@ const TodoForm = () => {
         <option value="high">High Priority</option>
         <option value="medium">Medium Priority</option>
         <option value="low">Low Priority</option>
-      </select>
+      </select> */}
 
       {/* <Button appName={"web"} onClick={handleSubmit}>
         Add

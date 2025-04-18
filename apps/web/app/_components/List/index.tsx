@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getList, Todo } from "../../../lib";
+import { getList, Priority, Todo } from "../../../lib";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setTodos, TodoState } from "../../../store/slice";
 import { deleteTodo, toggleTodoComplete } from "../../../store/slice";
@@ -41,19 +41,27 @@ export default function TodoList() {
     dispatch(deleteTodo(id));
     console.log("Deleted item with ID:", id);
   };
-  const sortedList = [...list]
-    .filter((todo) => (hideCompleted ? !todo.completed : true))
-    .sort((a, b) => {
-      if (sortOption === "date") {
-        return (
-          new Date(b.targetdate).getTime() - new Date(a.targetdate).getTime()
-        ); // latest first
-      } else if (sortOption === "priority") {
-        const priorityMap = { high: 3, medium: 2, low: 1 };
-        return priorityMap[b.priority] - priorityMap[a.priority]; // High → Low
-      }
-      return 0;
-    });
+
+  const priorityMap = {
+    [Priority.High]: 3,
+    [Priority.Medium]: 2,
+    [Priority.Low]: 1,
+  };
+
+  const sortedList = [...list].filter((todo) =>
+    hideCompleted ? !todo.completed : true
+  );
+  // .sort((a, b) => {
+  //   if (sortOption === "date") {
+  //     return (
+  //       new Date(b.targetdate).getTime() - new Date(a.targetdate).getTime()
+  //     ); // latest first
+  //   } else if (sortOption === "priority") {
+  //     const priorityMap = { high: 3, medium: 2, low: 1 };
+  //     return priorityMap[b.priority] - priorityMap[a.priority]; // High → Low
+  //   }
+  //   return 0;
+  // });
   return (
     <div className="">
       <h1 className="">TodoList</h1>
