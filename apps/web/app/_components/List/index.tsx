@@ -12,7 +12,7 @@ export default function TodoList() {
   const [hideCompleted, setHideCompleted] = useState(false);
 
   const [page, setPage] = useState(1);
-  const [limit] = useState(50); // Items per page
+  const [limit] = useState(5); // Items per page
   // const [sortOption, setSortOption] = useState<"date" | "priority" | "none">(
   //   "none"
   // );
